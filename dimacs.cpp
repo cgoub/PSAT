@@ -2,14 +2,18 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+
+//Conversion Dimacs en littéral 
 lit_t fromDimacs(int d) {
   return (abs(d) - 1)*2 + (d < 0 ? 1 : 0);
 }
 
+//Conversion littéral en Dimacs
 int toDimacs(lit_t l) {
   return (l/2 +1) * ((l%2 == 0) ? 1 : -1);
 }
 
+//Parcours 1 ligne Dimacs (s'arrète si fin de la clause ou fin du fichier -> 0) convertit puis insère chaque valeur dans ensemble lits + indique nombre max de variables
 void lit_ligne_dimacs(istream& input, set<lit_t> & lits, int & nbVars) {
   int n;
   do {
@@ -21,6 +25,7 @@ void lit_ligne_dimacs(istream& input, set<lit_t> & lits, int & nbVars) {
   } while(n != 0 && !input.eof());
 }
 
+//lit fichier DIMACS, triate chaque ligne avec lit_ligne_dimacs et stock chaque clauses dans dimacs
 void lit_dimacs(istream& input, dimacs & data) {
   string line;
   while (input.good() && !input.eof()) {
@@ -35,6 +40,7 @@ void lit_dimacs(istream& input, dimacs & data) {
   }
 }
 
+//retourne les littéraux correspondant à une solution satisfaisante (SAT)
 set<lit_t> lit_sortie_sat(istream& input) {
   string line;
   set<lit_t> result;
@@ -46,6 +52,8 @@ set<lit_t> lit_sortie_sat(istream& input) {
   return result;
 }
 
+
+//parcours chaque littéraux de l'ensemble, convertit en DIMACS. -> (ecrit ligne DIMACS qui fibit par 0)
 void ecrit_ligne_dimacs(ostream& output, const set<lit_t> & lits) {
   for(auto it = lits.cbegin(); it != lits.cend(); ++it) {
     output << toDimacs(*it) << " ";
@@ -53,6 +61,8 @@ void ecrit_ligne_dimacs(ostream& output, const set<lit_t> & lits) {
   output << 0 << endl;
 }
 
+
+//écrit la clause entière au format DIMACS
 void ecrit_clause_dimacs(ostream& output, const cls_t& clause) {
   ecrit_ligne_dimacs(output, clause.litteraux);
 }
